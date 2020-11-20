@@ -1,0 +1,616 @@
+HDFS Additional Usecases
+Note: This use cases covers some additional commands and extreme usecases, please ensure to try all of them.
+
+1. Create a new directory in linux namely ~/install/hdfsusecases and create a new file inside the above directory   namely ~/install/hdfsusecases/NYSE_2020_06_20.txt copying the first 1000 lines from an existing file  ~/pigdata/NYSE_daily
+
+[hduser@Inceptez ~]$ mkdir ~/install/hdfsusecases
+
+[hduser@Inceptez ~]$ head -10 ~/pigdata/NYSE_daily
+NYSE|CLI|2009-12-31|35.39|35.70|34.50|34.57|890100|34.12
+NYSE|CLI|2009-12-30|35.22|35.46|34.96|35.40|516900|34.94
+NYSE|CLI|2009-12-29|35.69|35.95|35.21|35.34|556500|34.88
+NYSE|CLI|2009-12-28|35.67|36.23|35.49|35.69|565000|35.23
+NYSE|CLI|2009-12-24|35.38|35.60|35.19|35.47|230200|35.01
+NYSE|CLI|2009-12-23|35.13|35.51|35.07|35.21|520200|34.75
+NYSE|CLI|2009-12-22|34.76|35.04|34.71|35.04|564600|34.58
+NYSE|CLI|2009-12-21|34.65|34.74|34.41|34.73|428400|34.28
+NYSE|CLI|2009-12-18|34.11|34.38|33.73|34.22|1152600|33.77
+NYSE|CLI|2009-12-17|34.18|34.53|33.84|34.21|1082600|33.76
+[hduser@Inceptez ~]$ head -1000 ~/pigdata/NYSE_daily >~/install/hdfsusecases/NYSE_2020_06_20.txt
+[hduser@Inceptez ~]$
+
+[hduser@Inceptez hdfsusecases]$ ls -lart
+total 68
+drwxrwxr-x 8 hduser hduser  4096 Aug 12 23:26 ..
+drwxrwxr-x 2 hduser hduser  4096 Aug 12 23:38 .
+-rw-rw-r-- 1 hduser hduser 57446 Aug 12 23:38 NYSE_2020_06_20.txt
+[hduser@Inceptez hdfsusecases]$ vi NYSE_2020_06_20.txt
+[hduser@Inceptez hdfsusecases]$ wc -l NYSE_2020_06_20.txt
+1000 NYSE_2020_06_20.txt
+[hduser@Inceptez hdfsusecases]$ 
+
+
+2. Create another new file inside the above directory namely ~/install/hdfsusecases/NYSE_2020_06_21.txt copying the line from 1001 to 2000 from an existing file ~/pigdata/NYSE_daily
+
+[hduser@Inceptez ~]$ head -2000 ~/pigdata/NYSE_daily | tail -1000  > ~/install/hdfsusecases/NYSE_2020_06_21.txt
+[hduser@Inceptez ~]$ echo $?
+0
+[hduser@Inceptez ~]$ wc -l ~/install/hdfsusecases/NYSE_2020_06_21.txt
+1000 /home/hduser/install/hdfsusecases/NYSE_2020_06_21.txt
+[hduser@Inceptez ~]$
+
+
+3. Create a directory in Hadoop namely /tmp/hdfsusecases
+
+[hduser@Inceptez ~]$ hadoop fs -mkdir -p /tmp/hdusecases
+20/08/13 00:40:40 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ 
+[hduser@Inceptez ~]$ echo $?
+0
+
+
+4. Check whether the above directory is created in HDFS or not using the below command (Note: We use –test –d option to check whether the given path is a directory or not)
+     hadoop fs -test -d /tmp/hdfsusecases
+
+[hduser@Inceptez ~]$ hadoop fs -test -d /tmp/hdusecases
+20/08/13 00:42:21 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ echo $?
+0
+[hduser@Inceptez ~]$
+
+
+5. Check what is the status code of the above command using, if it shows 0 then directory is created, if shows non   zero then the directory is not created then check the step 3 again.
+ echo $?
+
+[hduser@Inceptez ~]$ hadoop fs -mkdir -p /tmp/hdusecases
+20/08/13 00:40:40 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ 
+[hduser@Inceptez ~]$ echo $?
+0
+
+6. Copy file generated only in step 1 (~/install/hdfsusecases/NYSE_2020_06_20.txt) from linux to hdfs directory
+  /tmp/hdfsusecases in the name of NYSE_2020_06.txt
+
+[hduser@Inceptez ~]$ hadoop fs -rm -r /tmp
+20/08/13 01:44:46 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/08/13 01:44:48 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
+Deleted /tmp
+[hduser@Inceptez ~]$ hadoop fs -mkdir -p /tmp/hdfsusecases
+20/08/13 01:46:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ hadoop fs -copyFromLocal ~/install/hdfsusecases/NYSE_2020_06_20.txt /tmp/hdfsusecases/NYSE_2020_06.txt
+20/08/13 01:49:41 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ hadoop fs -ls /tmp/hdfsusecases
+20/08/13 01:50:32 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Found 1 items
+-rw-r--r--   1 hduser supergroup      57446 2020-08-13 01:49 /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez ~]$
+
+
+7. Like step 4 and 5, check whether the above file (/tmp/hdfsusecases/NYSE_2020_06.txt) is created or not in HDFS,
+  using -f option and check for the status code using $? and create a zero byte file in HDFS directory
+ /tmp/hdfsusecases in the name of _SUCCESS
+
+##Type: 1
+
+--Created success zero byte file in local LINUX directory
+[hduser@Inceptez ~]$ hadoop fs -test -f /tmp/hdfsusecases/NYSE_2020_06.txt >_SUCCESS
+20/08/13 02:00:16 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ ls -lrt _SUCCESS 
+-rw-rw-r-- 1 hduser hduser 0 Aug 13 02:00 _SUCCESS
+[hduser@Inceptez ~]$ cat _SUCCESS
+[hduser@Inceptez ~]$ 
+
+--Created success zero byte file is HDFS directory
+
+[hduser@Inceptez ~]$ ls -lrt _SUCCESS 
+-rw-rw-r-- 1 hduser hduser 0 Aug 13 02:00 _SUCCESS
+[hduser@Inceptez ~]$ hadoop fs -copyFromLocal ~/_SUCCESS /tmp/hdfsusecases 
+20/08/16 21:25:26 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ hadoop fs -ls /tmp/hdfsusecases
+20/08/16 21:25:50 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Found 2 items
+-rw-r--r--   1 hduser supergroup     114892 2020-08-13 08:28 /tmp/hdfsusecases/NYSE_2020_06.txt
+-rw-r--r--   1 hduser supergroup          0 2020-08-13 08:30 /tmp/hdfsusecases/_SUCCESS
+[hduser@Inceptez ~]$
+
+## Type:2
+
+[hduser@Inceptez ~]$ hadoop fs -test -f /tmp/hdfsusecases/NYSE_2020_06.txt
+20/08/16 21:32:52 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ echo $?
+0
+[hduser@Inceptez ~]$ hadoop fs -touchz /tmp/hdfsusecases/_SUCCESS1
+20/08/16 21:33:32 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ 
+
+---- Not able to create file through UNIX shell script
+#!/bin/bash
+
+filename=/tmp/hdfsusecases/NYSE_2020_06.txt
+
+if [ `hdfs fs -test -f $filename`  then 
+   echo "File exists" ##`hdfs fs -touchz /tmp/hdfsusecases/_SUCCESS1`"
+else 
+   echo "File does not exists"
+fi
+
+#!/bin/bash
+filename=/home/hduser/filename
+if `-test -f $filename` -eq 0  then   
+  echo '`touch $filename/_SUCCESS1`'  
+else echo 'File does not exists' 
+fi
+
+[hduser@Inceptez ~]$ hadoop fs -test -f /tmp/hdfsusecases/NYSE_2020_06.txt1 && echo " File found /tmp/hdfsusecases/ "$? || echo " File not found "$?
+20/08/13 08:23:55 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+ File not found 1
+[hduser@Inceptez ~]$ hadoop fs -test -f /tmp/hdfsusecases/NYSE_2020_06.txt && echo " File found /tmp/hdfsusecases/ "$? || echo " File not found "$?
+20/08/13 08:24:30 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+ File found /tmp/hdfsusecases/ 0
+[hduser@Inceptez ~]$
+----
+
+[hduser@Inceptez ~]$ ls -lart if_command
+-rwxr-xr-x 1 hduser hduser 138 Aug 16 21:54 if_command
+[hduser@Inceptez ~]$ cat if_command
+#!/bin/bash
+filename=/home/hduser/filename
+if [ -e $filename ]  
+then   
+  echo  " File Exists"  
+else
+   echo "File does not exists" 
+fi
+[hduser@Inceptez ~]$ ./if_command
+ File Exists
+[hduser@Inceptez ~]$
+
+
+
+
+8. Append the file generated in step 2 in linux (~/install/hdfsusecases/NYSE_2020_06_20.txt) with the file generated  in step 6 in the hdfs directory /tmp/hdfsusecases/NYSE_2020_06.txt
+
+~/install/hdfsusecases/NYSE_2020_06_20.txt /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez ~]$ wc -l ~/install/hdfsusecases/NYSE_2020_06_20.txt
+1000 /home/hduser/install/hdfsusecases/NYSE_2020_06_20.txt
+[hduser@Inceptez ~]$ 
+
+[hduser@Inceptez ~]$ hadoop fs -ls  /tmp/hdfsusecases/NYSE_2020_06.txt | wc -l
+20/08/13 08:45:09 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+1
+[hduser@Inceptez ~]$ hadoop fs -cat  /tmp/hdfsusecases/NYSE_2020_06.txt | wc -l
+20/08/13 08:45:34 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2000
+[hduser@Inceptez ~]$ 
+
+[hduser@Inceptez ~]$ hadoop fs -cat  /tmp/hdfsusecases/* | wc -l
+20/08/13 09:46:40 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2000
+[hduser@Inceptez ~]$
+
+9. Count the size of the file in HDFS /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez ~]$ hadoop fs -ls /tmp/hdfsusecases/NYSE_2020_06.txt 
+20/08/13 09:50:33 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+-rw-r--r--   1 hduser supergroup     114892 2020-08-13 08:28 /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez ~]$
+
+
+10. Count the number of rows are there in the /tmp/hdfsusecases/NYSE_2020_06.txt (Which should show the total count of the files created in step1 and 2)
+[hduser@Inceptez ~]$ hadoop fs -cat  /tmp/hdfsusecases/NYSE_2020_06.txt | wc -l
+20/08/13 08:45:34 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2000
+[hduser@Inceptez ~]$ 
+
+
+11. Display only line 11 to 20 from the file in HDFS /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez ~]$ hadoop fs -cat /tmp/hdfsusecases/NYSE_2020_06.txt | head -20 |  tail -10
+20/08/13 09:57:56 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+NYSE|CLI|2009-12-16|34.79|35.10|34.48|34.66|1007900|34.21
+NYSE|CLI|2009-12-15|34.60|34.91|34.39|34.84|813200|34.39
+NYSE|CLI|2009-12-14|34.21|34.90|33.86|34.82|987700|34.37
+NYSE|CLI|2009-12-11|33.55|34.08|33.40|34.00|836500|33.56
+NYSE|CLI|2009-12-10|33.61|33.80|33.09|33.26|1296300|32.83
+NYSE|CLI|2009-12-09|33.25|33.71|33.01|33.25|863900|32.82
+NYSE|CLI|2009-12-08|32.57|33.80|32.52|33.18|890000|32.75
+NYSE|CLI|2009-12-07|33.63|33.77|32.78|33.00|961800|32.57
+NYSE|CLI|2009-12-04|33.46|34.12|33.16|33.69|1412400|33.25
+NYSE|CLI|2009-12-03|32.55|33.43|32.48|32.65|1170600|32.22
+cat: Unable to write to output stream.
+[hduser@Inceptez ~]$
+
+
+12. Store line 11 to 20 from the file in HDFS /tmp/hdfsusecases/NYSE_2020_06.txt into linux file namely ~/install/hdfsusecases/NYSE_sampledata1.txt
+
+[hduser@Inceptez ~]$ pwd
+/home/hduser
+[hduser@Inceptez ~]$ hadoop fs -cat /tmp/hdfsusecases/NYSE_2020_06.txt | head -20 |  tail -10 >/home/hduser/install/hdfsusecases/NYSE_sampledata1.txt
+20/08/13 10:12:01 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+cat: Unable to write to output stream.
+[hduser@Inceptez ~]$ cd /home/hduser/install/hdfsusecases/
+[hduser@Inceptez hdfsusecases]$ ls -lart
+total 128
+drwxrwxr-x 8 hduser hduser  4096 Aug 12 23:26 ..
+-rw-rw-r-- 1 hduser hduser 57446 Aug 12 23:38 NYSE_2020_06_20.txt
+-rw-rw-r-- 1 hduser hduser 55552 Aug 13 00:33 NYSE_2020_06_21.txt
+drwxrwxr-x 2 hduser hduser  4096 Aug 13 10:12 .
+-rw-rw-r-- 1 hduser hduser   574 Aug 13 10:12 NYSE_sampledata1.txt
+[hduser@Inceptez hdfsusecases]$
+
+
+13. Delete the line number 1 from the HDFS file /tmp/hdfsusecases/NYSE_2020_06.txt , for example if the above file contains 100 rows, after deletion it should have only 99 rows in HDFS
+
+Note: we can’t do this directly because of the WORM property of HDFS data, think about the possible work around and try to achive the result
+
+[hduser@Inceptez hdfsusecases]$ pwd
+/home/hduser/install/hdfsusecases
+[hduser@Inceptez hdfsusecases]$ ls -lart
+total 136
+drwxrwxr-x 8 hduser hduser  4096 Aug 12 23:26 ..
+-rw-rw-r-- 1 hduser hduser 57446 Aug 12 23:38 NYSE_2020_06_20.txt
+-rw-rw-r-- 1 hduser hduser 55552 Aug 13 00:33 NYSE_2020_06_21.txt
+-rw-rw-r-- 1 hduser hduser   574 Aug 13 10:12 NYSE_sampledata1.txt
+drwxrwxr-x 2 hduser hduser  4096 Aug 13 11:18 .
+-rw-rw-r-- 1 hduser hduser  5758 Aug 13 11:18 NYSE_202006.txt
+[hduser@Inceptez hdfsusecases]$ wc -l NYSE_202006.txt 
+100 NYSE_202006.txt
+[hduser@Inceptez hdfsusecases]$ cat NYSE_202006.txt | head -5
+NYSE|CLI|2009-12-31|35.39|35.70|34.50|34.57|890100|34.12
+NYSE|CLI|2009-12-30|35.22|35.46|34.96|35.40|516900|34.94
+NYSE|CLI|2009-12-29|35.69|35.95|35.21|35.34|556500|34.88
+NYSE|CLI|2009-12-28|35.67|36.23|35.49|35.69|565000|35.23
+NYSE|CLI|2009-12-24|35.38|35.60|35.19|35.47|230200|35.01
+
+## sed -i 'm,nd' filename
+
+[hduser@Inceptez hdfsusecases]$ sed -i '1d' NYSE_202006.txt
+[hduser@Inceptez hdfsusecases]$ cat NYSE_202006.txt | head -5
+NYSE|CLI|2009-12-30|35.22|35.46|34.96|35.40|516900|34.94
+NYSE|CLI|2009-12-29|35.69|35.95|35.21|35.34|556500|34.88
+NYSE|CLI|2009-12-28|35.67|36.23|35.49|35.69|565000|35.23
+NYSE|CLI|2009-12-24|35.38|35.60|35.19|35.47|230200|35.01
+NYSE|CLI|2009-12-23|35.13|35.51|35.07|35.21|520200|34.75
+[hduser@Inceptez hdfsusecases]$ wc -l NYSE_202006.txt 
+99 NYSE_202006.txt
+[hduser@Inceptez hdfsusecases]$ hadoop fs -copyFromLocal /home/hduser/install/hdfsusecases /tmp/hdfsusecases/NYSE_2020_06.txt
+20/08/13 11:22:39 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+copyFromLocal: `/tmp/hdfsusecases/NYSE_2020_06.txt': File exists
+[hduser@Inceptez hdfsusecases]$ hadoop fs -copyFromLocal /home/hduser/install/hdfsusecases/NYSE_202006.txt /tmp/hdfsusecases
+20/08/13 11:23:54 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez hdfsusecases]$ hadoop fs -ls /tmp/hdfsusecases
+20/08/13 11:24:27 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Found 2 items
+-rw-r--r--   1 hduser supergroup       5701 2020-08-13 11:23 /tmp/hdfsusecases/NYSE_202006.txt
+-rw-r--r--   1 hduser supergroup     114892 2020-08-13 08:28 /tmp/hdfsusecases/NYSE_2020_06.txt
+[hduser@Inceptez hdfsusecases]$
+
+
+
+14. Copy the above file /tmp/hdfsusecases/NYSE_2020_06.txt in the name of /tmp/hdfsusecases/NYSE_2020_06_bkp.txt
+
+[hduser@Inceptez hdfsusecases]$ hadoop fs -cp /tmp/hdfsusecases/NYSE_2020_06.txt /tmp/hdfsusecases/NYSE_2020_06_bkp.txt
+20/08/13 11:28:12 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/08/13 11:28:16 WARN hdfs.DFSClient: DFSInputStream has been closed already
+[hduser@Inceptez hdfsusecases]$ hadoop fs -ls /tmp/hdfsusecases
+20/08/13 11:28:24 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Found 3 items
+-rw-r--r--   1 hduser supergroup       5701 2020-08-13 11:23 /tmp/hdfsusecases/NYSE_202006.txt
+-rw-r--r--   1 hduser supergroup     114892 2020-08-13 08:28 /tmp/hdfsusecases/NYSE_2020_06.txt
+-rw-r--r--   1 hduser supergroup     114892 2020-08-13 11:28 /tmp/hdfsusecases/NYSE_2020_06_bkp.txt
+[hduser@Inceptez hdfsusecases]$
+
+
+15. Merge the files in HDFS /tmp/hdfsusecases/NYSE_2020_06.txt and /tmp/hdfsusecases/NYSE_2020_06_bkp.txt
+into Linux directory namely ~/install/hdfsusecases/NYSE_2020_06_merged.txt
+Note: We have to use the option called -getmerge to achieve this as given below.
+hadoop fs -getmerge /tmp/hdfsusecases/NYSE_2020_06_bkp.txt /tmp/hdfsusecases/NYSE_2020_06.txt
+~/install/hdfsusecases/NYSE_2020_06_merged.txt
+
+[hduser@Inceptez hdfsusecases]$ pwd
+/home/hduser/install/hdfsusecases
+[hduser@Inceptez hdfsusecases]$ hadoop fs -getmerge /tmp/hdfsusecases/NYSE_2020_06_bkp.txt /tmp/hdfsusecases/NYSE_2020_06.txt ~/install/hdfsusecases/NYSE_2020_06_merged.txt
+20/08/13 11:33:15 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez hdfsusecases]$ cd ~/install/hdfsusecases
+[hduser@Inceptez hdfsusecases]$ ls -lart
+total 368
+drwxrwxr-x 8 hduser hduser   4096 Aug 12 23:26 ..
+-rw-rw-r-- 1 hduser hduser  57446 Aug 12 23:38 NYSE_2020_06_20.txt
+-rw-rw-r-- 1 hduser hduser  55552 Aug 13 00:33 NYSE_2020_06_21.txt
+-rw-rw-r-- 1 hduser hduser    574 Aug 13 10:12 NYSE_sampledata1.txt
+-rw-rw-r-- 1 hduser hduser   5701 Aug 13 11:20 NYSE_202006.txt
+drwxrwxr-x 2 hduser hduser   4096 Aug 13 11:33 .
+-rw-r--r-- 1 hduser hduser   1804 Aug 13 11:33 .NYSE_2020_06_merged.txt.crc
+-rw-r--r-- 1 hduser hduser 229784 Aug 13 11:33 NYSE_2020_06_merged.txt
+[hduser@Inceptez hdfsusecases]$
+
+
+
+16. Set the blocksize 64MB while writing the file in HDFS, check in the UI how many blocks are generated
+hadoop fs -D dfs.block.size=67108864 -put /home/hduser/install/hadoop-2.7.1.tar.gz /user/hduser/
+
+0(Off) or 1(On) = 1 Bit
+8 Bits          = 1 Byte
+1024 Bytes      = 1 Kilo Byte
+1024 Kilo Bytes = 1 Mega Byte
+
+64*1024*1024 = 67108864
+Ans:
+[hduser@Inceptez ~]$ hadoop fs -D dfs.block.size=67108864 -put /home/hduser/install/hadoop-2.7.1.tar.gz /user/hduser/
+20/08/13 11:41:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ hadoop fs -ls /user/hduser/hadoop-2*
+20/08/13 11:49:49 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+-rw-r--r--   1 hduser hadoop  210606807 2020-08-13 11:42 /user/hduser/hadoop-2.7.1.tar.gz
+[hduser@Inceptez ~]$
+
+## From UI
+
+Permission	Owner	Group	Size	Last Modified	Replication	Block Size	Name
+-rw-r--r--	hduser	hadoop	56.1 KB	8/13/2020, 1:11:41 AM	1	128 MB	NYSE_2020_06.txt
+-rw-r--r--	hduser	hadoop	751 B	8/6/2020, 5:03:36 AM	1	128 MB	cust4.txt
+-rw-r--r--	hduser	hadoop	492 B	8/5/2020, 7:31:18 PM	1	128 MB	filename
+-rw-r--r--	hduser	hadoop	492 B	8/9/2020, 8:02:00 AM	1	128 MB	filename1
+drwxr-xr-x	hduser	hadoop	0 B	8/9/2020, 8:35:36 AM	0	0 B	hadoop
+-rw-r--r--	hduser	hadoop	200.85 MB	8/13/2020, 11:42:20 AM	1	64 MB	hadoop-2.7.1.tar.gz
+
+
+17. Set the blocksize 128MB (134217728) for the same file generated in step 16 and replace the existing file in HDFS.
+[hduser@Inceptez ~]$ hadoop fs -ls /user/hduser/hadoop-2*
+20/08/13 11:49:49 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+-rw-r--r--   1 hduser hadoop  210606807 2020-08-13 11:42 /user/hduser/hadoop-2.7.1.tar.gz
+[hduser@Inceptez ~]$ hadoop fs -D dfs.block.size=134217728 -put /home/hduser/install/hadoop-2.7.1.tar.gz /user/hduser/
+20/08/13 11:51:12 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+put: `/user/hduser/hadoop-2.7.1.tar.gz': File exists
+[hduser@Inceptez ~]$ hadoop fs -rmr /user/hduser/hadoop-2.7.1.tar.gz
+rmr: DEPRECATED: Please use 'rm -r' instead.
+20/08/13 11:52:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/08/13 11:52:08 INFO fs.TrashPolicyDefault: Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
+Deleted /user/hduser/hadoop-2.7.1.tar.gz
+[hduser@Inceptez ~]$ hadoop fs -ls /user/hduser/hadoop-2*
+20/08/13 11:52:26 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+ls: `/user/hduser/hadoop-2*': No such file or directory
+[hduser@Inceptez ~]$ hadoop fs -D dfs.block.size=134217728 -put /home/hduser/install/hadoop-2.7.1.tar.gz /user/hduser/
+20/08/13 11:52:35 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[hduser@Inceptez ~]$ hadoop fs -ls /user/hduser/hadoop-2*
+20/08/13 11:52:46 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+-rw-r--r--   1 hduser hadoop  210606807 2020-08-13 11:52 /user/hduser/hadoop-2.7.1.tar.gz
+[hduser@Inceptez ~]$
+
+Permission	Owner	Group	Size	Last Modified	Replication	Block Size	Name
+-rw-r--r--	hduser	hadoop	56.1 KB	8/13/2020, 1:11:41 AM	1	128 MB	NYSE_2020_06.txt
+-rw-r--r--	hduser	hadoop	751 B	8/6/2020, 5:03:36 AM	1	128 MB	cust4.txt
+-rw-r--r--	hduser	hadoop	492 B	8/5/2020, 7:31:18 PM	1	128 MB	filename
+-rw-r--r--	hduser	hadoop	492 B	8/9/2020, 8:02:00 AM	1	128 MB	filename1
+drwxr-xr-x	hduser	hadoop	0 B	8/9/2020, 8:35:36 AM	0	0 B	hadoop
+-rw-r--r--	hduser	hadoop	200.85 MB	8/13/2020, 11:52:39 AM	1	128 MB	hadoop-2.7.1.tar.gz
+
+18. Set the replication to 3 while writing the file in HDFS
+hadoop fs -D dfs.replication=3 -put /home/hduser/install/hadoop-2.7.1.tar.gz /user/hduser/
+
+[hduser@Inceptez ~]$ hadoop fs -D dfs.replication=3 -put /user/hduser/hadoop-2.7.1.tar.gz /user/hduser/ 
+20/08/13 12:02:29 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+put: `/user/hduser/hadoop-2.7.1.tar.gz': No such file or directory
+
+
+
+
+19. To check the block information (In which datanode block is present,no of blocks,size,replication, etc)
+hadoop fsck - -files -locations -blocks /user/hduser/hadoop-2.7.1.tar.gz
+[hduser@Inceptez ~]$ hadoop fsck - -files -locations -blocks /user/hduser/hadoop-2.7.1.tar.gz
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+20/08/17 04:28:40 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Connecting to namenode via http://localhost:50070/fsck?ugi=hduser&files=1&locations=1&blocks=1&path=%2Fuser%2Fhduser%2Fhadoop-2.7.1.tar.gz
+FSCK started by hduser (auth:SIMPLE) from /127.0.0.1 for path /user/hduser/hadoop-2.7.1.tar.gz at Mon Aug 17 04:28:42 PDT 2020
+/user/hduser/hadoop-2.7.1.tar.gz 210606807 bytes, 2 block(s):  OK
+0. BP-1021972891-127.0.0.1-1596395538059:blk_1073741864_1041 len=134217728 repl=1 [DatanodeInfoWithStorage[127.0.0.1:50010,DS-f8d6fa04-3c52-4af8-8747-ca4d7de2bbb3,DISK]]
+1. BP-1021972891-127.0.0.1-1596395538059:blk_1073741865_1042 len=76389079 repl=1 [DatanodeInfoWithStorage[127.0.0.1:50010,DS-f8d6fa04-3c52-4af8-8747-ca4d7de2bbb3,DISK]]
+
+Status: HEALTHY
+ Total size:	210606807 B
+ Total dirs:	0
+ Total files:	1
+ Total symlinks:		0
+ Total blocks (validated):	2 (avg. block size 105303403 B)
+ Minimally replicated blocks:	2 (100.0 %)
+ Over-replicated blocks:	0 (0.0 %)
+ Under-replicated blocks:	0 (0.0 %)
+ Mis-replicated blocks:		0 (0.0 %)
+ Default replication factor:	1
+ Average block replication:	1.0
+ Corrupt blocks:		0
+ Missing replicas:		0 (0.0 %)
+ Number of data-nodes:		1
+ Number of racks:		1
+FSCK ended at Mon Aug 17 04:28:42 PDT 2020 in 8 milliseconds
+
+
+The filesystem under path '/user/hduser/hadoop-2.7.1.tar.gz' is HEALTHY
+[hduser@Inceptez ~]$
+
+
+
+20. Important Command DistCp (distributed copy) is a tool used for copying data between one Hadoop cluster to
+another cluster or with in the same cluster using mappers. (Interview Question – how do you copy data from
+production Hadoop cluster to Dev Hadoop cluster)
+hadoop distcp hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz hdfs://localhost:54310/user/hduser/hadoop/
+
+[hduser@Inceptez ~]$ hadoop distcp hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz hdfs://localhost:54310/user/hduser/hadoop/
+20/08/17 04:32:02 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/08/17 04:32:03 INFO tools.DistCp: Input Options: DistCpOptions{atomicCommit=false, syncFolder=false, deleteMissing=false, ignoreFailures=false, maxMaps=20, sslConfigurationFile='null', copyStrategy='uniformsize', sourceFileListing=null, sourcePaths=[hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz], targetPath=hdfs://localhost:54310/user/hduser/hadoop, targetPathExists=true, preserveRawXattrs=false}
+20/08/17 04:32:03 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+20/08/17 04:32:06 INFO Configuration.deprecation: io.sort.mb is deprecated. Instead, use mapreduce.task.io.sort.mb
+20/08/17 04:32:06 INFO Configuration.deprecation: io.sort.factor is deprecated. Instead, use mapreduce.task.io.sort.factor
+20/08/17 04:32:06 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+20/08/17 04:32:07 INFO mapreduce.JobSubmitter: number of splits:1
+20/08/17 04:32:07 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1597637178919_0001
+20/08/17 04:32:08 INFO impl.YarnClientImpl: Submitted application application_1597637178919_0001
+20/08/17 04:32:09 INFO mapreduce.Job: The url to track the job: http://Inceptez:8088/proxy/application_1597637178919_0001/
+20/08/17 04:32:09 INFO tools.DistCp: DistCp job-id: job_1597637178919_0001
+20/08/17 04:32:09 INFO mapreduce.Job: Running job: job_1597637178919_0001
+20/08/17 04:32:30 INFO mapreduce.Job: Job job_1597637178919_0001 running in uber mode : false
+20/08/17 04:32:30 INFO mapreduce.Job:  map 0% reduce 0%
+20/08/17 04:32:44 INFO mapreduce.Job:  map 100% reduce 0%
+20/08/17 04:33:08 INFO mapreduce.Job: Job job_1597637178919_0001 completed successfully
+20/08/17 04:33:08 INFO mapreduce.Job: Counters: 33
+	File System Counters
+		FILE: Number of bytes read=0
+		FILE: Number of bytes written=118210
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=210607202
+		HDFS: Number of bytes written=210606807
+		HDFS: Number of read operations=19
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=4
+	Job Counters 
+		Launched map tasks=1
+		Other local map tasks=1
+		Total time spent by all maps in occupied slots (ms)=34624
+		Total time spent by all reduces in occupied slots (ms)=0
+		Total time spent by all map tasks (ms)=34624
+		Total vcore-seconds taken by all map tasks=34624
+		Total megabyte-seconds taken by all map tasks=35454976
+	Map-Reduce Framework
+		Map input records=1
+		Map output records=0
+		Input split bytes=136
+		Spilled Records=0
+		Failed Shuffles=0
+		Merged Map outputs=0
+		GC time elapsed (ms)=887
+		CPU time spent (ms)=17110
+		Physical memory (bytes) snapshot=175366144
+		Virtual memory (bytes) snapshot=2088792064
+		Total committed heap usage (bytes)=94371840
+	File Input Format Counters 
+		Bytes Read=259
+	File Output Format Counters 
+		Bytes Written=0
+	org.apache.hadoop.tools.mapred.CopyMapper$Counter
+		BYTESCOPIED=210606807
+		BYTESEXPECTED=210606807
+		COPY=1
+[hduser@Inceptez ~]$ 
+
+
+21. choose to overwrite the target files unconditionally even if it exists using upto 2 mappers depends
+hadoop distcp -overwrite hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz hdfs://localhost:54310/user/hduser/hadoop/
+
+[hduser@Inceptez ~]$ hadoop distcp -overwrite hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz hdfs://localhost:54310/user/hduser/hadoop/
+20/08/17 04:36:14 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/08/17 04:36:14 INFO tools.DistCp: Input Options: DistCpOptions{atomicCommit=false, syncFolder=false, deleteMissing=false, ignoreFailures=false, maxMaps=20, sslConfigurationFile='null', copyStrategy='uniformsize', sourceFileListing=null, sourcePaths=[hdfs://localhost:54310/user/hduser/hadoop-2.7.1.tar.gz], targetPath=hdfs://localhost:54310/user/hduser/hadoop, targetPathExists=true, preserveRawXattrs=false}
+20/08/17 04:36:15 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+20/08/17 04:36:15 INFO Configuration.deprecation: io.sort.mb is deprecated. Instead, use mapreduce.task.io.sort.mb
+20/08/17 04:36:15 INFO Configuration.deprecation: io.sort.factor is deprecated. Instead, use mapreduce.task.io.sort.factor
+20/08/17 04:36:16 INFO client.RMProxy: Connecting to ResourceManager at /0.0.0.0:8032
+20/08/17 04:36:16 INFO mapreduce.JobSubmitter: number of splits:1
+20/08/17 04:36:17 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_1597637178919_0002
+20/08/17 04:36:17 INFO impl.YarnClientImpl: Submitted application application_1597637178919_0002
+20/08/17 04:36:17 INFO mapreduce.Job: The url to track the job: http://Inceptez:8088/proxy/application_1597637178919_0002/
+20/08/17 04:36:17 INFO tools.DistCp: DistCp job-id: job_1597637178919_0002
+20/08/17 04:36:17 INFO mapreduce.Job: Running job: job_1597637178919_0002
+20/08/17 04:36:24 INFO mapreduce.Job: Job job_1597637178919_0002 running in uber mode : false
+20/08/17 04:36:24 INFO mapreduce.Job:  map 0% reduce 0%
+20/08/17 04:36:36 INFO mapreduce.Job:  map 100% reduce 0%
+20/08/17 04:36:42 INFO mapreduce.Job: Job job_1597637178919_0002 completed successfully
+20/08/17 04:36:42 INFO mapreduce.Job: Counters: 33
+	File System Counters
+		FILE: Number of bytes read=0
+		FILE: Number of bytes written=118206
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=210607201
+		HDFS: Number of bytes written=210606807
+		HDFS: Number of read operations=19
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=5
+	Job Counters 
+		Launched map tasks=1
+		Other local map tasks=1
+		Total time spent by all maps in occupied slots (ms)=14036
+		Total time spent by all reduces in occupied slots (ms)=0
+		Total time spent by all map tasks (ms)=14036
+		Total vcore-seconds taken by all map tasks=14036
+		Total megabyte-seconds taken by all map tasks=14372864
+	Map-Reduce Framework
+		Map input records=1
+		Map output records=0
+		Input split bytes=135
+		Spilled Records=0
+		Failed Shuffles=0
+		Merged Map outputs=0
+		GC time elapsed (ms)=123
+		CPU time spent (ms)=7040
+		Physical memory (bytes) snapshot=172355584
+		Virtual memory (bytes) snapshot=2087981056
+		Total committed heap usage (bytes)=98566144
+	File Input Format Counters 
+		Bytes Read=259
+	File Output Format Counters 
+		Bytes Written=0
+	org.apache.hadoop.tools.mapred.CopyMapper$Counter
+		BYTESCOPIED=210606807
+		BYTESEXPECTED=210606807
+		COPY=1
+[hduser@Inceptez ~]$
+
+22. To view the content of editlog file, need to convert into xml file using editlog viewer
+hdfs oev -i edits_inprogress_0000000000000009315 -o edittest.xml
+
+[hduser@Inceptez ~]$ hdfs oev -i edits_inprogress_0000000000000000570 -o edittest.xml
+Encountered exception. Exiting: edits_inprogress_0000000000000000570 (No such file or directory)
+java.io.FileNotFoundException: edits_inprogress_0000000000000000570 (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.apache.hadoop.hdfs.server.namenode.EditLogFileInputStream$FileLog.getInputStream(EditLogFileInputStream.java:425)
+	at org.apache.hadoop.hdfs.server.namenode.EditLogFileInputStream.init(EditLogFileInputStream.java:141)
+	at org.apache.hadoop.hdfs.server.namenode.EditLogFileInputStream.getVersion(EditLogFileInputStream.java:266)
+	at org.apache.hadoop.hdfs.tools.offlineEditsViewer.OfflineEditsBinaryLoader.loadEdits(OfflineEditsBinaryLoader.java:64)
+	at org.apache.hadoop.hdfs.tools.offlineEditsViewer.OfflineEditsViewer.go(OfflineEditsViewer.java:142)
+	at org.apache.hadoop.hdfs.tools.offlineEditsViewer.OfflineEditsViewer.run(OfflineEditsViewer.java:228)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:70)
+	at org.apache.hadoop.util.ToolRunner.run(ToolRunner.java:84)
+	at org.apache.hadoop.hdfs.tools.offlineEditsViewer.OfflineEditsViewer.main(OfflineEditsViewer.java:237)
+[hduser@Inceptez ~]$
+
+[hduser@Inceptez current]$ hdfs oev -i edits_inprogress_0000000000000009189 -o edittest1.xml
+[hduser@Inceptez current]$ pwd
+/usr/local/hadoop_store/hdfs/namenode/current
+[hduser@Inceptez current]$ ls -lrt
+total 27284
+-rw-rw-r-- 1 hduser hduser 1048576 Sep  3 23:02 edits_0000000000000008606-0000000000000008606
+-rw-rw-r-- 1 hduser hduser   70011 Sep  4 00:24 edits_0000000000000008607-0000000000000009165
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 01:24 edits_0000000000000009166-0000000000000009167
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 02:24 edits_0000000000000009168-0000000000000009169
+-rw-rw-r-- 1 hduser hduser 1048576 Sep  4 02:24 edits_0000000000000009170-0000000000000009170
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 02:31 edits_0000000000000009171-0000000000000009172
+-rw-rw-r-- 1 hduser hduser     579 Sep  4 03:31 edits_0000000000000009173-0000000000000009180
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 04:31 edits_0000000000000009181-0000000000000009182
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 05:31 edits_0000000000000009183-0000000000000009184
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 06:31 edits_0000000000000009185-0000000000000009186
+-rw-rw-r-- 1 hduser hduser   17928 Sep  4 06:31 fsimage_0000000000000009186
+-rw-rw-r-- 1 hduser hduser      62 Sep  4 06:31 fsimage_0000000000000009186.md5
+-rw-rw-r-- 1 hduser hduser      42 Sep  4 07:31 edits_0000000000000009187-0000000000000009188
+-rw-rw-r-- 1 hduser hduser       5 Sep  4 07:31 seen_txid
+-rw-rw-r-- 1 hduser hduser 1048576 Sep  4 07:31 edits_inprogress_0000000000000009189
+-rw-rw-r-- 1 hduser hduser   17928 Sep  4 07:31 fsimage_0000000000000009188
+-rw-rw-r-- 1 hduser hduser      62 Sep  4 07:31 fsimage_0000000000000009188.md5
+-rw-rw-r-- 1 hduser hduser     205 Sep  4 08:01 edittest1.xml
+[hduser@Inceptez current]$ vi edittest1.xml
+[hduser@Inceptez current]$ cat edittest1.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<EDITS>
+  <EDITS_VERSION>-63</EDITS_VERSION>
+  <RECORD>
+    <OPCODE>OP_START_LOG_SEGMENT</OPCODE>
+    <DATA>
+      <TXID>9189</TXID>
+    </DATA>
+  </RECORD>
+</EDITS>
+[hduser@Inceptez current]$ 
+
+
